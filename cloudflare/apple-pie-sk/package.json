@@ -1,0 +1,21 @@
+{
+  "name": "apple-pie-sk",
+  "version": "1.0.0",
+  "description": "HeySalad secrets API - Apple Developer + AI credentials",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:dry": "wrangler deploy --dry-run",
+    "tail": "wrangler tail",
+    "setup-secrets": "bash scripts/setup-secrets.sh"
+  },
+  "dependencies": {
+    "hono": "^4.4.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240725.0",
+    "typescript": "^5.5.2",
+    "wrangler": "^3.65.0"
+  }
+}

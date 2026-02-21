@@ -1,0 +1,18 @@
+name = "apple-pie-sk"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# KV Namespace for agent keys
+# After creating with: wrangler kv:namespace create AGENT_KEYS
+# Replace the id below with the output from that command
+[[kv_namespaces]]
+binding = "AGENT_KEYS"
+id = "81e496299ec24dadbd01c469c69e1a81"
+
+# Custom domain
+# Set up in Cloudflare Dashboard → Workers → apple-pie-sk → Settings → Domains
+# Add: apple-pie-sk.heysalad.app
+
+[vars]
+ENVIRONMENT = "production"
