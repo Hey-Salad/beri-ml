@@ -1,0 +1,44 @@
+{
+  "name": "beri-ml",
+  "version": "0.1.0",
+  "description": "AI Team Development IDE - Where AI engineers collaborate to build apps",
+  "main": "index.js",
+  "scripts": {
+    "setup": "npm install && cd ide && npm install && cd ../backend && npm install",
+    "dev:ide": "cd ide && npm run watch",
+    "dev:backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run dev:ide\" \"npm run dev:backend\"",
+    "build": "npm run build:ide && npm run build:backend",
+    "build:ide": "cd ide && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "test": "npm run test:ide && npm run test:backend",
+    "test:ide": "cd ide && npm test",
+    "test:backend": "cd backend && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hey-Salad/beri-ml.git"
+  },
+  "keywords": [
+    "ai",
+    "ide",
+    "vscode",
+    "agents",
+    "automation",
+    "development",
+    "collaboration",
+    "ml",
+    "ios",
+    "macos",
+    "react-native"
+  ],
+  "author": "HeySalad Inc. <support@heysalad.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Hey-Salad/beri-ml/issues"
+  },
+  "homepage": "https://github.com/Hey-Salad/beri-ml#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
