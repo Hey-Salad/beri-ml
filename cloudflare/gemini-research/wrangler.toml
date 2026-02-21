@@ -1,0 +1,12 @@
+name = "gemini-research"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gemini-research-cache"
+database_id = "9f62275d-c2d9-4def-9d24-8dea741cac3d"
+
+[vars]
+ENVIRONMENT = "production"

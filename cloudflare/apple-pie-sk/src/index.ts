@@ -22,6 +22,7 @@ export interface Env {
   ANTHROPIC_API_KEY: string
   CHERIML_API_KEY: string
   GOOGLE_VERTEX_KEY: string
+  GEMINI_API_KEY: string
 
   // MCP Server
   MCP_API_KEY: string
@@ -117,6 +118,9 @@ app.get('/secrets/ai', async (c) => {
     anthropic: c.env.ANTHROPIC_API_KEY,
     cheriml: c.env.CHERIML_API_KEY,
     googleVertex: c.env.GOOGLE_VERTEX_KEY,
+    gemini: c.env.GEMINI_API_KEY,
+    researchWorker: 'https://gemini-research.heysalad-o.workers.dev',
+    researchAdminKey: c.env.ADMIN_KEY,
   })
 })
 
