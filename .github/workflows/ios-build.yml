@@ -6,9 +6,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  SECRETS_API: https://apple-pie-sk.heysalad.app
+
 jobs:
   build-ios:
-    runs-on: macos-14  # M1 runner (latest)
+    runs-on: macos-14
 
     steps:
       - name: Checkout code
@@ -61,17 +64,34 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Import certificates
+      - name: Install Fastlane
+        run: brew install fastlane
+
+      - name: Fetch Apple credentials from apple-pie-sk
         env:
-          CERTIFICATE_BASE64: ${{ secrets.IOS_DIST_CERT_BASE64 }}
-          CERTIFICATE_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          APPLE_PIE_SK_KEY: ${{ secrets.APPLE_PIE_SK_KEY }}
         run: |
-          echo "$CERTIFICATE_BASE64" | base64 --decode > certificate.p12
-          security create-keychain -p "" build.keychain
-          security import certificate.p12 -k build.keychain -P "$CERTIFICATE_PASSWORD" -A
-          security list-keychains -s build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
+          CREDS=$(curl -sf $SECRETS_API/secrets/apple \
+            -H "Authorization: Bearer $APPLE_PIE_SK_KEY")
+
+          echo "MATCH_PASSWORD=$(echo $CREDS | python3 -c "import sys,json; print(json.load(sys.stdin)['matchPassword'])")" >> $GITHUB_ENV
+          echo "MATCH_GIT_URL=$(echo $CREDS | python3 -c "import sys,json; print(json.load(sys.stdin)['matchGitUrl'])")" >> $GITHUB_ENV
+          echo "APP_STORE_KEY_ID=$(echo $CREDS | python3 -c "import sys,json; print(json.load(sys.stdin)['keyId'])")" >> $GITHUB_ENV
+          echo "APP_STORE_ISSUER_ID=$(echo $CREDS | python3 -c "import sys,json; print(json.load(sys.stdin)['issuerId'])")" >> $GITHUB_ENV
+          echo "TEAM_ID=$(echo $CREDS | python3 -c "import sys,json; print(json.load(sys.stdin)['teamId'])")" >> $GITHUB_ENV
+
+          # Write p8 key to file for Fastlane
+          echo $CREDS | python3 -c "import sys,json; print(json.load(sys.stdin)['keyP8'])" > /tmp/AuthKey.p8
+
+      - name: Run Fastlane Match (fetch certs)
+        run: |
+          fastlane match appstore \
+            --git_url "$MATCH_GIT_URL" \
+            --app_identifier "com.heysalad.sally" \
+            --readonly true \
+            --api_key_path /tmp/api_key.json
+        env:
+          MATCH_PASSWORD: ${{ env.MATCH_PASSWORD }}
 
       - name: Build IPA
         run: |
@@ -79,6 +99,7 @@ jobs:
             -scheme App \
             -configuration Release \
             -archivePath build/App.xcarchive \
+            -allowProvisioningUpdates \
             archive
 
           xcodebuild -exportArchive \
@@ -87,13 +108,14 @@ jobs:
             -exportOptionsPlist exportOptions.plist
 
       - name: Upload to TestFlight
-        env:
-          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
         run: |
           xcrun altool --upload-app \
             --type ios \
             --file build/App.ipa \
-            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
-            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
+            --apiKey "$APP_STORE_KEY_ID" \
+            --apiIssuer "$APP_STORE_ISSUER_ID" \
+            --apiKey-path /tmp/AuthKey.p8
+
+      - name: Cleanup secrets
+        if: always()
+        run: rm -f /tmp/AuthKey.p8 /tmp/api_key.json
