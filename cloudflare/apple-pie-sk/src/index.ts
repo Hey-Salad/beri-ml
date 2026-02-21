@@ -22,6 +22,14 @@ export interface Env {
   ANTHROPIC_API_KEY: string
   CHERIML_API_KEY: string
   GOOGLE_VERTEX_KEY: string
+
+  // MCP Server
+  MCP_API_KEY: string
+  MCP_GATEWAY_URL: string
+
+  // Mac Build Infrastructure (Worker Secrets)
+  MAC_SSH_KEY: string
+  MAC_HOST_IP: string
 }
 
 interface AgentKey {
@@ -112,6 +120,36 @@ app.get('/secrets/ai', async (c) => {
   })
 })
 
+// ─── MCP Secrets ─────────────────────────────────────────────────────────────
+
+app.get('/secrets/mcp', async (c) => {
+  const ok = await authenticate(c, ['ai'])
+  if (!ok) return c.json({ error: 'Unauthorized' }, 401)
+
+  return c.json({
+    apiKey: c.env.MCP_API_KEY,
+    gatewayUrl: c.env.MCP_GATEWAY_URL,
+    domains: ['engineering', 'sales', 'customer-success', 'marketing', 'people', 'finance', 'data', 'executive'],
+  })
+})
+
+// ─── Mac Build Infrastructure ────────────────────────────────────────────────
+
+app.get('/secrets/mac', async (c) => {
+  const ok = await authenticate(c, ['mac'])
+  if (!ok) return c.json({ error: 'Unauthorized' }, 401)
+
+  return c.json({
+    sshKey: c.env.MAC_SSH_KEY,
+    hostIp: c.env.MAC_HOST_IP || null,
+    keyName: 'heysalad-mac-builder',
+    region: 'eu-west-1',
+    instanceType: 'mac2.metal',
+    sshUser: 'ec2-user',
+    sshPort: 22,
+  })
+})
+
 // ─── Individual Secret (admin only) ──────────────────────────────────────────
 
 app.get('/secrets/:name', async (c) => {
@@ -139,7 +177,7 @@ app.post('/agents/register', async (c) => {
     return c.json({ error: 'name (string) and scopes (array) required' }, 400)
   }
 
-  const validScopes = ['apple', 'ai', 'deploy', 'admin']
+  const validScopes = ['apple', 'ai', 'deploy', 'mac', 'admin']
   const invalidScopes = scopes.filter((s) => !validScopes.includes(s))
   if (invalidScopes.length > 0) {
     return c.json(
@@ -188,3 +226,4 @@ app.delete('/agents/:key', async (c) => {
 })
 
 export default app
+// This is appended - see full file for context
