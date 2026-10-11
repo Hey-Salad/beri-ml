@@ -33,7 +33,7 @@
     "react-native"
   ],
   "author": "HeySalad Inc. <support@heysalad.com>",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "bugs": {
     "url": "https://github.com/Hey-Salad/beri-ml/issues"
   },

@@ -1,6 +1,7 @@
 {
   "name": "apple-pie-sk",
   "version": "1.0.0",
+  "license": "AGPL-3.0-only",
   "description": "HeySalad secrets API - Apple Developer + AI credentials",
   "private": true,
   "scripts": {
