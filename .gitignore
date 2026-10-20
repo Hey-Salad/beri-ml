@@ -91,3 +91,12 @@ coverage/
 # Secrets
 secrets/
 .secrets/
+.env.*
+!.env.example
+google-credentials.json
+*service-account*.json
+*credentials*.json
+*credentials*.json.backup
+.npmrc
+venv/
+.venv/
