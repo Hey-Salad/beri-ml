@@ -177,7 +177,7 @@ const creds = await res.json()
 ```bash
 cd /home/admin/beri-ml/cloudflare/apple-pie-sk
 
-CLOUDFLARE_API_TOKEN="lov5W3fKQaWIasMvyYUSWSu9YRUo3BnkcjnCLL8l" \
+CLOUDFLARE_API_TOKEN="<redacted cloudflare-api-key …LL8l>" \
 CLOUDFLARE_ACCOUNT_ID="67a17ada4efeee4480283035cc0c5f90" \
 printf 'your-secret-value' | npx wrangler secret put SECRET_NAME
 ```
